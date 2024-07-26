@@ -35,6 +35,22 @@ def plot_data(data, indicators, sync_axis=None):
     p.vbar(df.index[gain],width,df.Open[gain], df.Close[gain], fill_color = "#00ff00", line_color = "#00ff00")
     p.vbar(df.index[loss],width,df.Open[loss], df.Close[loss], fill_color = "#ff0000", line_color = "ff0000")
     
+    for indicator in indicators: 
+        if indicator == "30 Day SMA":
+            df['SMA30'] = df['Close'].rolling(30).mean()
+            p.line(df.index, df.SMA30, color ="purple", legend_label = "30 Day SMA")
+        elif indicator == "100 Day SMA":
+            df["100 Day SMA "] = df['Close'].rolling(100).mean()
+            p.line(df.index, df.SMA100, color ="blue", legend_label="100 Day SMA")
+        elif indicator == "Linear Regression Line":
+            par = np.polyfit(range(len(df.index.values)), df.Close.values, 1, full = True)
+            slope = par[0][0]
+            intercept = par[0][1]
+            y_pred = [slope * i + intercept for i in range(len(df.index.values))]
+            p.segment(df.index[0], y_pred[0], df.index[-1], y_pred[-1],legend_label = "Linear Regression", color = "red")
+
+        p.legend.location = "top_left"
+        p.legend.click_policy = "hide"
     return p 
     
 
@@ -63,7 +79,7 @@ load_button = Button(label = "load Data",button_type = "success")
 
 load_button.on_click(lambda: on_button_click(stock1_text.value, stock2_text.value,
                                              date_picker_from.value, date_picker_to.value,
-                                             indicators_choice.value))                                                 
+                                             indicators_choice.value))                                                   
 
 layout = column(stock1_text, stock2_text, date_picker_from, date_picker_to, indicators_choice, load_button)
 
